@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "graphile-migrate": "^1.4.1"
+  }
+}
