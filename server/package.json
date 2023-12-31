@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "graphile-migrate": "^1.4.1"
+    "express": "^4.18.2",
+    "graphile-migrate": "^1.4.1",
+    "pg": "^8.11.3",
+    "socket.io": "^4.7.2"
   }
 }

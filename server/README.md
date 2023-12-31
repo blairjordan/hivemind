@@ -68,5 +68,11 @@ SELECT add_continuous_aggregate_policy('signals_avg_strength_1s',
     end_offset => INTERVAL '1 minute',
     schedule_interval => INTERVAL '5 minutes');
 
+
+-- demo users
+INSERT INTO entities (id, name, type) VALUES
+  ('00000000-0000-0000-0000-000000000001', 'user1', 'user'),
+  ('00000000-0000-0000-0000-000000000002', 'user2', 'user');
+
 ```
 
