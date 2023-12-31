@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
 const emitSignals = async () => {
   try {
     const result = await pool.query(
-      `SELECT * FROM signals_avg_strength_1s WHERE bucket > NOW() - INTERVAL '30 seconds'
+      `SELECT * FROM signals_avg_strength_1s_polyfill
       ORDER BY bucket ASC`
     )
     io.emit("signalsUpdate", result.rows)
@@ -55,7 +55,7 @@ const emitSignals = async () => {
   }
 }
 
-setInterval(emitSignals, 1_000)
+setInterval(emitSignals, 500)
 
 server.listen(3000, () => {
   console.log("Listening on *:3000")

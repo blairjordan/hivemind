@@ -12,6 +12,7 @@ psql -U postgres -h localhost
 CREATE database hivemind;
 \c hivemind
 CREATE EXTENSION IF NOT EXISTS timescaledb;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE entities (
     id UUID PRIMARY KEY,
@@ -68,6 +69,23 @@ SELECT add_continuous_aggregate_policy('signals_avg_strength_1s',
     end_offset => INTERVAL '1 minute',
     schedule_interval => INTERVAL '5 minutes');
 
+
+CREATE OR REPLACE VIEW signals_avg_strength_1s_polyfill AS
+WITH last_minute_series AS (
+    SELECT date_trunc('second', generate_series(
+               NOW() - interval '1 minute',
+               NOW(),
+               '1 second'::interval
+           )) AS bucket
+)
+SELECT
+    lms.bucket,
+    COALESCE(sas.from_entity_id, uuid_nil()) AS from_entity_id,
+    COALESCE(sas.to_entity_id, uuid_nil()) AS to_entity_id,
+    COALESCE(sas.type, 'love') AS type,
+    COALESCE(sas.avg_strength, 0) AS avg_strength
+FROM last_minute_series lms
+LEFT JOIN signals_avg_strength_1s sas ON lms.bucket = sas.bucket;
 
 -- demo users
 INSERT INTO entities (id, name, type) VALUES
