@@ -1,9 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import io from "socket.io-client"
+import { useSignals } from "./useSignals"
 
-const SOCKET_SERVER_URL = "http://localhost:3000"
 const SLOT_COUNT = 10
 const MAX_DURATION = 1000
 
@@ -11,18 +10,12 @@ const FROM_UUID = "00000000-0000-0000-0000-000000000001"
 const TO_UUID = "00000000-0000-0000-0000-000000000002"
 
 function KeyPressComponent() {
-  const [socket, setSocket] = useState(null)
+  const { socket, sendSignal } = useSignals({})
   const [isKeyPressed, setIsKeyPressed] = useState(false)
   const [keydownTime, setKeydownTime] = useState(0)
   const [durations, setDurations] = useState(new Array(SLOT_COUNT).fill(0))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [currentVelocity, setCurrentVelocity] = useState(0)
-
-  useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL)
-    setSocket(newSocket)
-    return () => newSocket.close()
-  }, [setSocket])
 
   const calculateVelocity = () => {
     let newDurations = [...durations]
@@ -45,7 +38,7 @@ function KeyPressComponent() {
 
     // write to socket
     if (socket) {
-      socket.emit("sendSignal", {
+      sendSignal({
         from: FROM_UUID,
         to: TO_UUID,
         type: "love",

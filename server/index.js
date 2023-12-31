@@ -23,7 +23,7 @@ const io = socketIo(server, {
 })
 
 io.on("connection", (socket) => {
-  console.log("New client connected")
+  console.log("🖥️ new client connected")
 
   socket.on("sendSignal", async (signal) => {
     try {
@@ -32,16 +32,30 @@ io.on("connection", (socket) => {
         "INSERT INTO signals (from_entity_id, to_entity_id, type, strength) VALUES ($1, $2, $3, $4)",
         [from, to, type, strength]
       )
-      console.log("Signal saved:", signal)
+      console.log("💾 saved signal", signal)
     } catch (err) {
-      console.error("Error saving signal:", err)
+      console.error("error saving signal:", err)
     }
   })
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected")
+    console.log("client disconnected")
   })
 })
+
+const emitSignals = async () => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM signals_avg_strength_1s WHERE bucket > NOW() - INTERVAL '30 seconds'
+      ORDER BY bucket ASC`
+    )
+    io.emit("signalsUpdate", result.rows)
+  } catch (err) {
+    console.error("Error fetching signal strength:", err)
+  }
+}
+
+setInterval(emitSignals, 1_000)
 
 server.listen(3000, () => {
   console.log("Listening on *:3000")
