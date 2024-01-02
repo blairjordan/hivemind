@@ -70,22 +70,35 @@ SELECT add_continuous_aggregate_policy('signals_avg_strength_1s',
     schedule_interval => INTERVAL '5 minutes');
 
 
-CREATE OR REPLACE VIEW signals_avg_strength_1s_polyfill AS
-WITH last_minute_series AS (
-    SELECT date_trunc('second', generate_series(
-               NOW() - interval '1 minute',
-               NOW(),
-               '1 second'::interval
-           )) AS bucket
-)
-SELECT
-    lms.bucket,
-    COALESCE(sas.from_entity_id, uuid_nil()) AS from_entity_id,
-    COALESCE(sas.to_entity_id, uuid_nil()) AS to_entity_id,
-    COALESCE(sas.type, 'love') AS type,
-    COALESCE(sas.avg_strength, 0) AS avg_strength
-FROM last_minute_series lms
-LEFT JOIN signals_avg_strength_1s sas ON lms.bucket = sas.bucket;
+CREATE OR REPLACE FUNCTION get_signals_avg_strength_1s_polyfill(signal_type text)
+RETURNS TABLE(bucket timestamp, from_entity_id uuid, to_entity_id uuid, type text, avg_strength double precision) AS
+$$
+    SELECT
+        lms.bucket,
+        COALESCE(sas.from_entity_id, uuid_nil()) AS from_entity_id,
+        COALESCE(sas.to_entity_id, uuid_nil()) AS to_entity_id,
+        COALESCE(sas.type, signal_type) AS type,
+        COALESCE(sas.avg_strength, 0) AS avg_strength
+    FROM (
+        SELECT date_trunc('second', generate_series(
+                   NOW() - interval '1 minute',
+                   NOW(),
+                   '1 second'::interval
+               )) AS bucket
+    ) AS lms
+    LEFT JOIN (
+        SELECT DISTINCT ON (date_trunc('second', bucket))
+            date_trunc('second', bucket) AS bucket,
+            from_entity_id,
+            to_entity_id,
+            type,
+            avg_strength
+        FROM signals_avg_strength_1s
+        WHERE type = signal_type OR type IS NULL
+        ORDER BY date_trunc('second', bucket), bucket DESC
+    ) sas ON lms.bucket = sas.bucket;
+$$
+LANGUAGE sql;
 
 -- demo users
 INSERT INTO entities (id, name, type) VALUES

@@ -6,7 +6,10 @@ import { Line } from "react-chartjs-2"
 import Chart from "chart.js/auto"
 
 const SignalVisualizer = () => {
-  const [signals, setSignals] = useState([])
+  const [signals, setSignals] = useState({
+    love: [],
+    think: [],
+  })
 
   const onSignalsUpdate = useCallback((data) => {
     setSignals(data)
@@ -15,17 +18,27 @@ const SignalVisualizer = () => {
   const _ = useSignals({ onSignalsUpdate })
 
   const chartData = {
-    labels: signals.map((_, index) => ``),
+    labels: Array.from({ length: 61 }, () => ""),
     datasets: [
       {
-        label: "Signal Strength",
-        data: signals.map((signal) => signal.avg_strength),
+        label: "Love Signal Strength",
+        data: signals.love.map((signal) => signal.avg_strength),
         backgroundColor: "rgba(255, 99, 132, 0.5)",
         borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 2,
-        tension: 0.4, // smooth line
-        pointRadius: 0, // hide data points
-        fill: "origin", // 0: fill to 'origin'
+        tension: 0.4,
+        pointRadius: 0,
+        fill: "origin",
+      },
+      {
+        label: "Think Signal Strength",
+        data: signals.think.map((signal) => signal.avg_strength),
+        backgroundColor: "rgba(54, 162, 235, 0.5)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 0,
+        fill: "origin",
       },
     ],
   }

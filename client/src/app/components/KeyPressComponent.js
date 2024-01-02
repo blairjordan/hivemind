@@ -9,7 +9,7 @@ const MAX_DURATION = 1000
 const FROM_UUID = "00000000-0000-0000-0000-000000000001"
 const TO_UUID = "00000000-0000-0000-0000-000000000002"
 
-function KeyPressComponent() {
+function KeyPressComponent({ triggerKey, signalType, icon }) {
   const { socket, sendSignal } = useSignals({})
   const [isKeyPressed, setIsKeyPressed] = useState(false)
   const [keydownTime, setKeydownTime] = useState(0)
@@ -41,7 +41,7 @@ function KeyPressComponent() {
       sendSignal({
         from: FROM_UUID,
         to: TO_UUID,
-        type: "love",
+        type: signalType,
         strength: currentVelocity,
       })
     }
@@ -53,14 +53,20 @@ function KeyPressComponent() {
   }, [isKeyPressed, keydownTime, durations, currentIndex, currentVelocity])
 
   const handleKeyDown = (e) => {
-    if (!isKeyPressed) {
+    if (
+      !isKeyPressed &&
+      (e.key === triggerKey || e.key === triggerKey.toUpperCase())
+    ) {
       setKeydownTime(Date.now())
       setIsKeyPressed(true)
     }
   }
 
-  const handleKeyUp = () => {
-    if (isKeyPressed) {
+  const handleKeyUp = (e) => {
+    if (
+      isKeyPressed &&
+      (e.key === triggerKey || e.key === triggerKey.toUpperCase())
+    ) {
       setIsKeyPressed(false)
     }
   }
@@ -77,8 +83,10 @@ function KeyPressComponent() {
 
   return (
     <div>
-      <p>velocity: {currentVelocity.toFixed(2)}</p>
-      <p>{isKeyPressed ? "⌨ key pressed" : "⌨ key released"}</p>
+      <p>
+        {icon}: {currentVelocity.toFixed(2)}
+      </p>
+      {/* <p>{isKeyPressed ? "⌨ key pressed" : "⌨ key released"}</p> */}
     </div>
   )
 }

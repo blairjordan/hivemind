@@ -45,11 +45,20 @@ io.on("connection", (socket) => {
 
 const emitSignals = async () => {
   try {
-    const result = await pool.query(
-      `SELECT * FROM signals_avg_strength_1s_polyfill
+    const result = {}
+    result.think = (
+      await pool.query(
+        `SELECT * FROM get_signals_avg_strength_1s_polyfill('think')
       ORDER BY bucket ASC`
-    )
-    io.emit("signalsUpdate", result.rows)
+      )
+    ).rows
+    result.love = (
+      await pool.query(
+        `SELECT * FROM get_signals_avg_strength_1s_polyfill('love')
+      ORDER BY bucket ASC`
+      )
+    ).rows
+    io.emit("signalsUpdate", result)
   } catch (err) {
     console.error("Error fetching signal strength:", err)
   }
