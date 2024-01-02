@@ -58,6 +58,12 @@ const emitSignals = async () => {
       ORDER BY bucket ASC`
       )
     ).rows
+    result.sex = (
+      await pool.query(
+        `SELECT * FROM get_signals_avg_strength_1s_polyfill('sex')
+      ORDER BY bucket ASC`
+      )
+    ).rows
     io.emit("signalsUpdate", result)
   } catch (err) {
     console.error("Error fetching signal strength:", err)
