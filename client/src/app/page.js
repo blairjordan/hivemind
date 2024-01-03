@@ -8,6 +8,7 @@ export default function Home() {
         <KeyPressComponent icon="❤️" triggerKey="l" signalType="love" />
         <KeyPressComponent icon="👍" triggerKey="t" signalType="think" />
         <KeyPressComponent icon="🍆" triggerKey="s" signalType="sex" />
+        <KeyPressComponent icon="😡" triggerKey="a" signalType="anger" />
         {/* <SignalVisualizer /> */}
         <Scene />
       </div>
