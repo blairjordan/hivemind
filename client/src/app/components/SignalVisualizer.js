@@ -1,46 +1,40 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useContext, useCallback } from "react"
 import { useSignals } from "./useSignals"
 import { Line } from "react-chartjs-2"
+import { SocketContext } from "../context/SocketContext"
 import Chart from "chart.js/auto"
 
-const SignalVisualizer = () => {
-  const [signals, setSignals] = useState({
-    love: [],
-    think: [],
-  })
+const SignalVisualizer = ({ signalInfo }) => {
+  const signalTypesInitState = signalInfo.reduce((prev, curr) => {
+    prev[curr.type] = []
+    return prev
+  }, {})
+
+  const [signals, setSignals] = useState(signalTypesInitState)
 
   const onSignalsUpdate = useCallback((data) => {
     setSignals(data)
   }, [])
 
-  const _ = useSignals({ onSignalsUpdate })
+  const socket = useContext(SocketContext)
+  const _ = useSignals(socket, { onSignalsUpdate })
 
   const chartData = {
     labels: Array.from({ length: 61 }, () => ""),
-    datasets: [
-      {
-        label: "Love Signal Strength",
-        data: signals.love.map((signal) => signal.avg_strength),
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
-        fill: "origin",
-      },
-      {
-        label: "Think Signal Strength",
-        data: signals.think.map((signal) => signal.avg_strength),
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0,
-        fill: "origin",
-      },
-    ],
+    datasets: signalInfo.map((signal) => ({
+      label: signal.label,
+      data: signals[signal.type]
+        ? signals[signal.type].map((signal) => signal.avg_strength)
+        : [],
+      backgroundColor: signal.color,
+      borderColor: signal.color,
+      borderWidth: 2,
+      tension: 0.4,
+      pointRadius: 0,
+      fill: "origin",
+    })),
   }
 
   const chartOptions = {

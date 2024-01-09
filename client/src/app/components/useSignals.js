@@ -1,27 +1,22 @@
 import React, { createContext, useState, useEffect } from "react"
 import io from "socket.io-client"
 
-const SOCKET_SERVER_URL = "http://localhost:3000"
 export const SignalContext = createContext()
 
-export const useSignals = ({ onSignalsUpdate = null }) => {
-  const [socket, setSocket] = useState(null)
+export const useSignals = (socket, options = {}) => {
+  const { onSignalsUpdate = null } = options
 
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL)
-    setSocket(newSocket)
-
-    if (onSignalsUpdate) {
-      newSocket.on("signalsUpdate", onSignalsUpdate)
+    if (socket && onSignalsUpdate) {
+      socket.on("signalsUpdate", onSignalsUpdate)
     }
 
     return () => {
-      if (onSignalsUpdate) {
-        newSocket.off("signalsUpdate", onSignalsUpdate)
+      if (socket && onSignalsUpdate) {
+        socket.off("signalsUpdate", onSignalsUpdate)
       }
-      newSocket.close()
     }
-  }, [])
+  }, [socket])
 
   const sendSignal = (signalData) => {
     if (socket) {

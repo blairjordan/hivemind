@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
+import { SocketContext } from "../context/SocketContext"
 import { useSignals } from "./useSignals"
 
 const SLOT_COUNT = 10
@@ -10,7 +11,8 @@ const FROM_UUID = "00000000-0000-0000-0000-000000000001"
 const TO_UUID = "00000000-0000-0000-0000-000000000002"
 
 function KeyPressComponent({ triggerKey, signalType, icon }) {
-  const { socket, sendSignal } = useSignals({})
+  const socket = useContext(SocketContext)
+  const { sendSignal } = useSignals(socket)
   const [isKeyPressed, setIsKeyPressed] = useState(false)
   const [keydownTime, setKeydownTime] = useState(0)
   const [durations, setDurations] = useState(new Array(SLOT_COUNT).fill(0))

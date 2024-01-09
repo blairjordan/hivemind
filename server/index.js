@@ -22,6 +22,8 @@ const io = socketIo(server, {
   },
 })
 
+const signals = ["love", "think", "joy", "sadness"]
+
 io.on("connection", (socket) => {
   console.log("🖥️ new client connected")
 
@@ -45,31 +47,19 @@ io.on("connection", (socket) => {
 
 const emitSignals = async () => {
   try {
-    const result = {}
-    result.think = (
-      await pool.query(
-        `SELECT * FROM get_signals_avg_strength_1s_polyfill('think')
-      ORDER BY bucket ASC`
+    const result = signals.reduce((prev, curr) => {
+      prev[curr] = []
+      return prev
+    }, {})
+
+    for (const signal of signals) {
+      const { rows } = await pool.query(
+        `SELECT * FROM get_signals_avg_strength_1s_polyfill($1) ORDER BY bucket ASC`,
+        [signal]
       )
-    ).rows
-    result.love = (
-      await pool.query(
-        `SELECT * FROM get_signals_avg_strength_1s_polyfill('love')
-      ORDER BY bucket ASC`
-      )
-    ).rows
-    result.sex = (
-      await pool.query(
-        `SELECT * FROM get_signals_avg_strength_1s_polyfill('sex')
-      ORDER BY bucket ASC`
-      )
-    ).rows
-    result.anger = (
-      await pool.query(
-        `SELECT * FROM get_signals_avg_strength_1s_polyfill('anger')
-      ORDER BY bucket ASC`
-      )
-    ).rows
+      result[signal] = rows
+    }
+
     io.emit("signalsUpdate", result)
   } catch (err) {
     console.error("Error fetching signal strength:", err)
