@@ -8,7 +8,7 @@ export default function Home() {
     {
       type: "love",
       label: "Love",
-      color: "rgba(255, 99, 132, 1)",
+      color: "rgba(255, 99, 132, 0.5)",
       data: [],
       icon: "❤️",
       triggerKey: "l",
@@ -16,7 +16,7 @@ export default function Home() {
     {
       type: "think",
       label: "Think",
-      color: "rgba(54, 162, 235, 1)",
+      color: "rgba(54, 162, 235, 0.5)",
       data: [],
       icon: "💭",
       triggerKey: "t",
@@ -24,7 +24,7 @@ export default function Home() {
     {
       type: "joy",
       label: "Joy",
-      color: "rgba(255, 206, 86, 1)",
+      color: "rgba(255, 206, 86, 0.5)",
       data: [],
       icon: "😄",
       triggerKey: "j",
@@ -32,7 +32,7 @@ export default function Home() {
     {
       type: "sadness",
       label: "Sadness",
-      color: "rgba(75, 192, 192, 1)",
+      color: "rgba(75, 192, 192, 0.5)",
       data: [],
       icon: "😢",
       triggerKey: "s",

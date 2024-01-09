@@ -54,7 +54,7 @@ const emitSignals = async () => {
 
     for (const signal of signals) {
       const { rows } = await pool.query(
-        `SELECT * FROM get_signals_avg_strength_1s_polyfill($1) ORDER BY bucket ASC`,
+        `SELECT * FROM get_signals_avg_strength_1s_zeroset($1) ORDER BY bucket ASC`,
         [signal]
       )
       result[signal] = rows

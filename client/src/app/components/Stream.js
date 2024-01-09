@@ -115,7 +115,7 @@ const Stream = ({ centralNodePosition, targetNodePosition, signalInfo }) => {
   return (
     <>
       {signalInfo.map((signal, i) => {
-        return createMeshLine(signals[signal.type], signal.color, i * 0.15)
+        return createMeshLine(signals[signal.type], signal.color, i * 0.05)
       })}
     </>
   )
