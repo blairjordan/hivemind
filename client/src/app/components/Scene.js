@@ -7,11 +7,12 @@ import * as THREE from "three"
 import { OrbitControls, OrthographicCamera } from "@react-three/drei"
 import { EffectComposer, Bloom } from "@react-three/postprocessing"
 import Stream from "./Stream"
+import Node from "./Node"
 
-const Scene = ({ signalInfo }) => {
+const Scene = ({ entities, signalInfo }) => {
   const centralNodePosition = new THREE.Vector3(0, 0, 0)
 
-  const generateRandomPositions = (radius, count) => {
+  const generatePositions = (radius, count) => {
     let positions = []
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2
@@ -23,7 +24,7 @@ const Scene = ({ signalInfo }) => {
     return positions
   }
 
-  const userPositions = generateRandomPositions(2, 5)
+  const userPositions = generatePositions(2, entities.length)
 
   const createUserSphere = (position, color, key) => {
     return (
@@ -64,7 +65,15 @@ const Scene = ({ signalInfo }) => {
       {createUserSphere(centralNodePosition, "white", "me")}
       {userPositions.map((userPosition, index) => {
         const color = "#FFFFFF"
-        return createUserSphere(userPosition, color, `user_${index}`)
+        const label = entities[index].label
+        return (
+          <Node
+            position={userPosition}
+            color={color}
+            label={label}
+            key={`user_${index}`}
+          />
+        )
       })}
       <EffectComposer>
         <Bloom luminanceThreshold={0.1} radius={0.6} intensity={0.65} />
