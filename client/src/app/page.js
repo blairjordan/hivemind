@@ -4,6 +4,17 @@ import Scene from "./components/Scene"
 import { SocketProvider } from "./context/SocketContext"
 
 export default function Home() {
+  const entities = [
+    {
+      id: "00000000-0000-0000-0000-000000000001",
+      label: "user1",
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000002",
+      label: "user2",
+    },
+  ]
+
   const signalInfo = [
     {
       type: "love",
@@ -51,7 +62,7 @@ export default function Home() {
               key={signal.type}
             />
           ))}
-          <Scene signalInfo={signalInfo} />
+          <Scene entities={entities} signalInfo={signalInfo} />
           <SignalVisualizer signalInfo={signalInfo} />
         </SocketProvider>
       </div>
